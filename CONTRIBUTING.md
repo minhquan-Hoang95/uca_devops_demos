@@ -1,14 +1,37 @@
 # Contributing
 
-## Branching
+## Branch Strategy
 
-| Purpose | Pattern |
-|---------|---------|
-| New feature / task | `feature/<short-description>` |
-| Bug fix | `fix/<short-description>` |
-| Documentation | `docs/<short-description>` |
+```
+main
+ └── dev               ← integration branch (merge here before main)
+      ├── input        ← input data group
+      ├── output       ← output / results group
+      ├── solver       ← OPL/CPLEX solver group
+      └── documentation← docs group
+```
 
-Branch from `main` and open a Pull Request when ready.
+| Branch | Who works here | Merges into |
+|--------|---------------|-------------|
+| `input` | Input data group | `dev` |
+| `output` | Output / results group | `dev` |
+| `solver` | OPL/CPLEX solver group | `dev` |
+| `documentation` | Documentation group | `dev` |
+| `dev` | Integration — all groups | `main` |
+| `main` | Stable releases only | — |
+
+**Rules:**
+- Each group works exclusively on their named branch.
+- Open a PR from your group branch → `dev` when a feature is ready.
+- `dev` → `main` PRs are opened only when the integrated work is stable and reviewed.
+- Never commit directly to `main` or `dev`.
+
+For short-lived work within a group branch, sub-branches are welcome:
+
+```
+solver/room-capacity-constraint
+input/parse-json-format
+```
 
 ## Commits
 
