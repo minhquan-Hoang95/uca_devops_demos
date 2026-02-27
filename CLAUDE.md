@@ -45,6 +45,7 @@ mkdocs serve
 |----------|---------|------|
 | `ci.yml` | push/PR to `main` or `dev` | `lint`, `test`, `security` in parallel; `validate-opl` independently |
 | `codeql.yml` | push/PR to `main`/`dev` + weekly (Mon 06:00 UTC) | CodeQL SAST on Python (`security-and-quality` suite) |
+| `scorecard.yml` | push to `main` + weekly (Mon 06:00 UTC) | OSSF Scorecard — publishes SARIF to Security → Code scanning |
 | `deploy-docs.yml` | push to `main` when `docs/`, `mkdocs.yml`, or `README.md` changes | MkDocs build → GitHub Pages |
 
 CI required checks for `main`/`dev`: **Lint & format check**, **Tests**.
@@ -57,6 +58,7 @@ All `uses:` in workflows are pinned to full commit SHAs (supply chain hardening)
 - **`pip-audit`** — CVE scan on installed packages, runs on every CI build
 - **CodeQL** — deep SAST via GitHub's analysis engine, results in Security → Code scanning
 - **Dependabot** — weekly PRs for outdated `pip` and `github-actions` dependencies, targeting `dev`
+- **OSSF Scorecard** — measures ~18 security practices; results in Security → Code scanning (`ossf-scorecard` category) and on [securityscorecards.dev](https://securityscorecards.dev)
 
 ## Docker
 
