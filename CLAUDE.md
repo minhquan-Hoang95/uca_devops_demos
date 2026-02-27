@@ -96,3 +96,8 @@ Run all hooks manually: `pre-commit run --all-files`
 - `.flake8` — max-line-length 88, aligned with black
 - `mkdocs.yml` — Material theme, `docs/` as source
 - `.github/dependabot.yml` — weekly updates for pip + github-actions, PRs target `dev`
+- `.pre-commit-config.yaml` — trailing-whitespace, end-of-file, yaml/json check, large files, detect-private-key, black, flake8, bandit
+
+## Reference
+
+- `LEARNING.md` — full annotated guide explaining every tool and decision in this repo; use it to reproduce this setup on any new project.
