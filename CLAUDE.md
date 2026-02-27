@@ -19,8 +19,9 @@ main  ←  dev  ←  input | output | solver | documentation
 ## Development Commands
 
 ```bash
-# Install dev dependencies
+# Install dev dependencies and activate pre-commit hooks
 pip install -r requirements-dev.txt
+pre-commit install
 
 # Run tests with coverage
 pytest
@@ -71,6 +72,23 @@ docker run --rm uca-devops
 ```
 
 `Dockerfile` uses `python:3.12-slim`, installs deps in a cached layer, then copies `scripts/` and `data/`.
+
+## Pre-commit Hooks
+
+Run `pre-commit install` once after cloning. Hooks run automatically on every `git commit`:
+
+| Hook | What it catches |
+|------|----------------|
+| `trailing-whitespace`, `end-of-file-fixer` | Whitespace issues |
+| `check-yaml`, `check-json` | Syntax errors in config files |
+| `check-merge-conflict` | Leftover conflict markers |
+| `check-added-large-files` | Files > 1 MB |
+| `detect-private-key` | Accidentally committed secrets |
+| `black` | Auto-formats Python code |
+| `flake8` | Style violations |
+| `bandit` | Python security issues |
+
+Run all hooks manually: `pre-commit run --all-files`
 
 ## Tool Configuration
 
