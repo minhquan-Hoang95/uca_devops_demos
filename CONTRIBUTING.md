@@ -26,6 +26,17 @@ main
 - `dev` → `main` PRs are opened only when the integrated work is stable and reviewed.
 - Never commit directly to `main` or `dev`.
 
+**Branch protection summary:**
+
+| Branch | Direct push | PR required | Review required | CI must pass |
+|--------|:-----------:|:-----------:|:---------------:|:------------:|
+| `main` | blocked | yes | 1 approval | yes (branch must be up to date) |
+| `dev` | blocked | yes | 1 approval | yes (branch must be up to date) |
+| `input` | allowed | no | no | yes |
+| `output` | allowed | no | no | yes |
+| `solver` | allowed | no | no | yes |
+| `documentation` | allowed | no | no | yes |
+
 For short-lived work within a group branch, sub-branches are welcome:
 
 ```
