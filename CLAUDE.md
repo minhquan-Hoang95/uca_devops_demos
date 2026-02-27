@@ -41,17 +41,38 @@ mkdocs serve
 
 ## CI/CD
 
-Two workflows in `.github/workflows/`:
-
 | Workflow | Trigger | Jobs |
 |----------|---------|------|
-| `ci.yml` | push/PR to `main` or `dev` | `lint` and `test` run in parallel; `validate-opl` runs independently |
-| `deploy-docs.yml` | push to `main` when `docs/`, `mkdocs.yml`, or `README.md` changes | builds MkDocs site → deploys to GitHub Pages |
+| `ci.yml` | push/PR to `main` or `dev` | `lint`, `test`, `security` in parallel; `validate-opl` independently |
+| `codeql.yml` | push/PR to `main`/`dev` + weekly (Mon 06:00 UTC) | CodeQL SAST on Python (`security-and-quality` suite) |
+| `deploy-docs.yml` | push to `main` when `docs/`, `mkdocs.yml`, or `README.md` changes | MkDocs build → GitHub Pages |
 
-CI required checks: **Lint & format check**, **Tests**.
+CI required checks for `main`/`dev`: **Lint & format check**, **Tests**.
+
+All `uses:` in workflows are pinned to full commit SHAs (supply chain hardening).
+
+## Security
+
+- **`bandit`** — Python SAST, runs on every CI build (`bandit -r scripts/ -ll`)
+- **`pip-audit`** — CVE scan on installed packages, runs on every CI build
+- **CodeQL** — deep SAST via GitHub's analysis engine, results in Security → Code scanning
+- **Dependabot** — weekly PRs for outdated `pip` and `github-actions` dependencies, targeting `dev`
+
+## Docker
+
+```bash
+# Build
+docker build -t uca-devops .
+
+# Run
+docker run --rm uca-devops
+```
+
+`Dockerfile` uses `python:3.12-slim`, installs deps in a cached layer, then copies `scripts/` and `data/`.
 
 ## Tool Configuration
 
 - `pyproject.toml` — black (line-length 88, py312) and pytest (`testpaths = ["tests"]`, coverage on `scripts/`)
 - `.flake8` — max-line-length 88, aligned with black
 - `mkdocs.yml` — Material theme, `docs/` as source
+- `.github/dependabot.yml` — weekly updates for pip + github-actions, PRs target `dev`
