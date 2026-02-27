@@ -1,0 +1,67 @@
+name: Deploy docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "results/**"
+      - "README.md"
+  workflow_dispatch:
+
+# Allow only one concurrent deployment
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build docs site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install MkDocs
+        run: pip install mkdocs mkdocs-material
+
+      - name: Build site
+        # Falls back to a minimal site from README if no mkdocs.yml exists yet.
+        run: |
+          if [ -f mkdocs.yml ]; then
+            mkdocs build --strict --site-dir _site
+          else
+            mkdir -p _site
+            cp README.md _site/index.md
+            echo "site_name: UCA DevOps Demos" > _mkdocs_tmp.yml
+            echo "docs_dir: _site" >> _mkdocs_tmp.yml
+            mkdocs build --config-file _mkdocs_tmp.yml --site-dir _site_out
+            mv _site_out _site
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
