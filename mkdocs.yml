@@ -1,0 +1,19 @@
+site_name: UCA DevOps Demos
+site_description: Course allocation project — S2 DevOps curriculum
+site_url: https://minhquan-Hoang95.github.io/uca_devops_demos/
+
+docs_dir: docs
+site_dir: _site
+
+theme:
+  name: material
+  palette:
+    scheme: default
+    primary: indigo
+  features:
+    - navigation.instant
+    - navigation.top
+    - content.code.copy
+
+nav:
+  - Home: index.md

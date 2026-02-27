@@ -14,30 +14,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
 
-      - name: Install dev dependencies
-        run: pip install -r requirements-dev.txt
+      - run: pip install -r requirements-dev.txt
 
-      - name: black – format check
-        run: black --check scripts/ tests/
-
-      - name: flake8 – style check
-        run: flake8 scripts/ tests/
+      - run: black --check scripts/ tests/
+      - run: flake8 scripts/ tests/
 
   test:
     name: Tests
     runs-on: ubuntu-latest
-    needs: lint
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
@@ -45,13 +38,12 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements-dev.txt
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          [ -f requirements.txt ] && pip install -r requirements.txt || true
 
-      - name: Run tests with coverage
-        run: pytest
+      - run: pytest
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: coverage-report
           path: coverage.xml
@@ -63,29 +55,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check OPL file inventory
+      - name: Check .mod files have an objective function
         run: |
-          echo "=== .mod files ==="
-          find opl/ -name "*.mod" | sort || echo "(none yet)"
-          echo "=== .dat files ==="
-          find opl/ -name "*.dat" | sort || echo "(none yet)"
-
-      - name: Verify OPL syntax markers
-        # Full validation requires IBM CPLEX (not available on hosted runners).
-        # This step checks that every .mod file contains at least a 'minimize'
-        # or 'maximize' keyword and that every .dat file references a known model.
-        # Replace / extend this step when a self-hosted runner with CPLEX is available.
-        run: |
-          FAILED=0
-          for mod in $(find opl/ -name "*.mod"); do
-            if ! grep -qE "minimize|maximize" "$mod"; then
-              echo "WARNING: $mod has no objective function keyword"
-              FAILED=1
-            fi
+          mods=$(find opl/ -name "*.mod")
+          [ -z "$mods" ] && echo "No .mod files yet." && exit 0
+          failed=0
+          for f in $mods; do
+            grep -qE "minimize|maximize" "$f" || { echo "WARN: $f missing objective"; failed=1; }
           done
-          if [ $FAILED -ne 0 ]; then
-            echo "OPL model validation warnings found."
-            exit 1
-          fi
-          echo "All OPL models passed basic validation (or no models present)."
-        continue-on-error: true   # remove once models are stable
+          exit $failed
+        continue-on-error: true   # remove once OPL models are stable
