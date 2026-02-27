@@ -1,5 +1,7 @@
 # uca_devops_demos — Course Allocation Project
 
+![CI](https://github.com/minhquan-Hoang95/uca_devops_demos/actions/workflows/ci.yml/badge.svg)
+
 Optimization-based course allocation system developed as part of the S2 DevOps curriculum at UCA.
 
 ## Project Goal
